@@ -39,9 +39,24 @@ Router.post('/login', (req, res) => {
         'SELECT * FROM usuario WHERE correo = ? AND contrasena = ?',
         [correo, contrasena],
         (err, rows, fields) => {
-            if (!err && rows.length > 0) {
-                // Usuario encontrado, redirigir o devolver algún tipo de éxito
-                res.json({ success: true, message: 'Inicio de sesión exitoso' });
+            if (err) {
+                console.error('Error al buscar usuario:', err);
+                return res.status(500).json({ success: false, message: 'Error al iniciar sesión. Por favor, intenta de nuevo más tarde.' });
+            }
+
+            if (rows.length > 0) {
+                // Usuario encontrado, enviar datos del usuario
+                const usuario = rows[0]; // Suponiendo que solo hay un usuario con ese correo y contraseña
+                res.json({
+                    success: true,
+                    message: 'Inicio de sesión exitoso',
+                    usuario: {
+                        idusuario: usuario.idusuario,
+                        nombre: usuario.nombre,
+                        correo: usuario.correo
+                        // Puedes incluir otros campos del usuario si los necesitas
+                    }
+                });
             } else {
                 // Usuario no encontrado o credenciales incorrectas
                 res.status(401).json({ success: false, message: 'Correo electrónico o contraseña incorrectos' });
