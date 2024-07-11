@@ -66,19 +66,6 @@ Router.delete("/:idinvitado", (req, res) => {
             res.status(500).send("Error en la eliminación");
         }
     });
-
-    // Cron job que se ejecuta cada 12 horas
-cron.schedule('0 */12 * * *', () => {
-    const query = "DELETE FROM invitados WHERE created_at < NOW() - INTERVAL 12 HOUR";
-
-    mysqlConexion.query(query, (err, result) => {
-        if (err) {
-            console.log("Error en la eliminación automática:", err);
-        } else {
-            console.log("Eliminación automática completada, registros afectados:", result.affectedRows);
-        }
-    });
-});
 });
 
 module.exports = Router;
