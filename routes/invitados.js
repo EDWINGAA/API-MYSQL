@@ -49,4 +49,23 @@ Router.post("/", (req, res) => {
     });
 });
 
+// Endpoint para eliminar un invitado por idinvitado
+Router.delete("/:idinvitado", (req, res) => {
+    const idinvitado = req.params.idinvitado;
+    const query = "DELETE FROM invitados WHERE idinvitado = ?";
+
+    mysqlConexion.query(query, [idinvitado], (err, result) => {
+        if (!err) {
+            if (result.affectedRows > 0) {
+                res.send("Invitado eliminado exitosamente");
+            } else {
+                res.status(404).send("Invitado no encontrado");
+            }
+        } else {
+            console.log(err);
+            res.status(500).send("Error en la eliminación");
+        }
+    });
+});
+
 module.exports = Router;
