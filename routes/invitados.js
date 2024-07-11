@@ -1,6 +1,11 @@
 const express = require("express");
+const app = express();
 const Router = express.Router();
-const mysqlConexion = require("../conexion");
+const mysqlConexion = require("./conexion");
+const cron = require('node-cron');
+
+app.use(express.json());
+app.use("/invitados", Router);
 
 // Endpoint para obtener todos los invitados
 Router.get("/", (req, res) => {
@@ -37,7 +42,7 @@ Router.get("/:nombreU", (req, res) => {
 // Endpoint para insertar un nuevo invitado
 Router.post("/", (req, res) => {
     const { nombreinv, codigoa, nombreU } = req.body;
-    const query = "INSERT INTO invitados (nombreinv, codigoa, nombreU) VALUES (?, ?, ?)";
+    const query = "INSERT INTO invitados (nombreinv, codigoa, nombreU, created_at) VALUES (?, ?, ?, NOW())";
 
     mysqlConexion.query(query, [nombreinv, codigoa, nombreU], (err, result) => {
         if (!err) {
@@ -68,4 +73,20 @@ Router.delete("/:idinvitado", (req, res) => {
     });
 });
 
-module.exports = Router;
+// Cron job que se ejecuta cada 12 horas
+cron.schedule('0 */12 * * *', () => {
+    const query = "DELETE FROM invitados WHERE created_at < NOW() - INTERVAL 12 HOUR";
+
+    mysqlConexion.query(query, (err, result) => {
+        if (err) {
+            console.log("Error en la eliminación automática:", err);
+        } else {
+            console.log("Eliminación automática completada, registros afectados:", result.affectedRows);
+        }
+    });
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Servidor corriendo en el puerto ${PORT}`);
+});
