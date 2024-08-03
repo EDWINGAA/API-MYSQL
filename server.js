@@ -4,6 +4,7 @@ const pool = require("./conexion");
 const usuarios = require("./routes/usuarios");
 const invitados = require("./routes/invitados");
 const apertura = require("./routes/apertura");
+const puertaS = require("./routes/puertaS"); // Agrega la ruta de puertaS
 
 const app = express();
 app.use(bodyParser.json());
@@ -20,6 +21,7 @@ app.use((req, res, next) => {
 app.use("/usuarios", usuarios);
 app.use("/invitados", invitados);
 app.use("/apertura", apertura);
+app.use("/puertaS", puertaS); // Usa la nueva ruta
 
 // Puerto en el que escucha el servidor
 const PORT = process.env.PORT || 3001;
