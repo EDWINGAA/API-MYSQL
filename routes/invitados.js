@@ -82,4 +82,28 @@ cron.schedule('0 */12 * * *', () => {
     });
 });
 
+
+// Endpoint para iniciar sesión con codigoa y nombreinv
+Router.post("/login", (req, res) => {
+    const { codigoa, nombreinv } = req.body;
+    const query = `
+        SELECT * FROM invitados
+        WHERE codigoa = ? AND nombreinv = ?
+    `;
+
+    mysqlConexion.query(query, [codigoa, nombreinv], (err, rows) => {
+        if (err) {
+            console.log(err);
+            res.status(500).send("Error en la consulta");
+        } else if (rows.length > 0) {
+            // Usuario encontrado
+            res.send("Inicio de sesión exitoso");
+        } else {
+            // Usuario no encontrado
+            res.status(401).send("Credenciales inválidas");
+        }
+    });
+});
+
+
 module.exports = Router;
