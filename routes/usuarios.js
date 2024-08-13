@@ -65,4 +65,25 @@ Router.post('/login', (req, res) => {
     );
 });
 
+// Método GET para obtener claveU por nombre de usuario
+Router.get("/clave/:nombre", (req, res) => {
+    const { nombre } = req.params;
+    const query = "SELECT claveU FROM usuario WHERE nombre = ?";
+
+    mysqlConexion.query(query, [nombre], (err, rows, fields) => {
+        if (!err) {
+            if (rows.length > 0) {
+                res.json(rows[0]);  // Devuelve la claveU si se encuentra el usuario
+            } else {
+                res.status(404).json({ message: "Usuario no encontrado" });
+            }
+        } else {
+            console.log(err);
+            res.status(500).json({ error: "Error al obtener la claveU" });
+        }
+    });
+});
+
+
+
 module.exports = Router;
