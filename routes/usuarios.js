@@ -2,6 +2,15 @@ const express = require("express");
 const Router = express.Router();
 const mysqlConexion = require("../conexion");
 
+// Función para generar una claveU aleatoria de 4 dígitos entre 1 y 4
+const generateRandomClaveU = () => {
+    let claveU = '';
+    for (let i = 0; i < 4; i++) {
+        claveU += Math.floor(Math.random() * 4) + 1;
+    }
+    return claveU;
+};
+
 // Método GET
 Router.get("/", (req, res) => {
     mysqlConexion.query("SELECT * from usuario", (err, rows, fields) => {
@@ -13,17 +22,19 @@ Router.get("/", (req, res) => {
     });
 });
 
-// Método POST
+// Método POST para crear un nuevo usuario con claveU
 Router.post("/", (req, res) => {
     const { idusuario, nombre, correo, contrasena } = req.body;
+    const claveU = generateRandomClaveU();  // Genera la claveU aleatoria
+
     const query = `
-        INSERT INTO usuario (idusuario, nombre, correo, contrasena) 
-        VALUES (?, ?, ?, ?)
+        INSERT INTO usuario (idusuario, nombre, correo, contrasena, claveU) 
+        VALUES (?, ?, ?, ?, ?)
     `;
 
-    mysqlConexion.query(query, [idusuario, nombre, correo, contrasena], (err, results, fields) => {
+    mysqlConexion.query(query, [idusuario, nombre, correo, contrasena, claveU], (err, results, fields) => {
         if (!err) {
-            res.status(201).json({ message: "Usuario creado", id: results.insertId });
+            res.status(201).json({ message: "Usuario creado", id: results.insertId, claveU: claveU });
         } else {
             console.log(err);
             res.status(500).json({ error: "Error al crear el usuario" });
@@ -83,7 +94,5 @@ Router.get("/clave/:nombre", (req, res) => {
         }
     });
 });
-
-
 
 module.exports = Router;
